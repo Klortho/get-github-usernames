@@ -1,0 +1,26 @@
+{
+  "name": "get-github-usernames",
+  "version": "0.0.1",
+  "description": "Determine GitHub usernames from email addresses, even if they are hidden",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klortho/get-github-usernames.git"
+  },
+  "keywords": [
+    "github"
+  ],
+  "author": "Chris Maloney",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "bugs": {
+    "url": "https://github.com/klortho/get-github-usernames/issues"
+  },
+  "homepage": "https://github.com/klortho/get-github-usernames#readme",
+  "dependencies": {
+    "gift": "^0.7.0",
+    "mkdirp": "^0.5.1"
+  }
+}
