@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/klortho/get-github-usernames#readme",
   "dependencies": {
+    "@klortho/line-reader": "0.0.1",
     "gift": "^0.7.0",
     "mkdirp": "^0.5.1",
     "rimraf": "^2.5.1"

@@ -38,3 +38,16 @@ When it's done (the following steps are manual so far):
   be in the `author/login` field for that commit. Cross-reference to the
   email in the `commit/author/email` field.
 
+
+## To do
+
+* It shouldn't wipe out the dummy repo every time; it should first check it
+  to see which emails already have commits, and then only add commits for
+  those that don't.
+
+* Automate:
+
+    * Pushing the repo to github (take the github repo url as a
+      command-line param, or in a config file).
+    * Reading the commits from the API and producing the report
+

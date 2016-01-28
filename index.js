@@ -2,51 +2,18 @@
 
 var fs = require('fs');
 var git = require('gift');
+var lineReader = require('@klortho/line-reader')
 var mkdirp = require('mkdirp');
-var readline = require('readline');
 var rimraf = require('rimraf');
-
 
 var dummy_repo = 'dummy-repo';
 var readme = dummy_repo + "/README.md";
 
 rimraf.sync(dummy_repo);
 
-var lineReader = function(file, line_handler) {
-  return new Promise(function(resolve, reject) {
-    var readstream_error = false;
-
-    var rs = fs.createReadStream(file)
-      .on('error', function() {
-        readstream_error = true;
-        this.emit('end');
-      })
-    ;
-
-    var inf = readline.createInterface({input: rs})
-      .on('line', function(line) {
-        line_handler(line);
-      })
-      .on('close', function(data) {
-        if (readstream_error) {
-          reject("Error trying to open read stream for " + file);
-        }
-        resolve();
-      })
-      .on('end', resolve)
-    ;
-  });
-};
-
-
-
-var _sequence = Promise.resolve();
-
-
 var emails = [];
 var p = lineReader('users.txt', function(line) {
   if (line != '') {
-    //console.log("got " + line);
     emails.push(line);
   }
 })
@@ -62,63 +29,57 @@ var p = lineReader('users.txt', function(line) {
   }
 )
 
-.then(function(emails) {
-  console.log('emails: %o', emails);
+.then(
+  function(emails) {
+    console.log('emails: %o', emails);
 
-  mkdirp(dummy_repo, function(err) {
-    if (err) {
-      throw "Failed to make directory " + dummy_repo;
-    }
-
-    git.init(dummy_repo, function(err, repo) {
+    mkdirp(dummy_repo, function(err) {
       if (err) {
-        throw "Failed to initialize git repo"
+        throw "Failed to make directory " + dummy_repo;
       }
 
-      fs.writeFile(readme, 'Initial line\n',
-        function (err) {
-          if (err) throw err;
-          console.log('Repo initialized');
+      git.init(dummy_repo, function(err, repo) {
+        if (err) {
+          throw "Failed to initialize git repo"
+        }
 
-          _sequence.foo = 42;
-          emails.reduce(function(sequence, email) {
-            console.log("reduce, sequence = " + sequence + ", email = " + email +
-              ", foo = " + sequence.foo);
-            return sequence.then(function() {
-              console.log("Start sequence for " + email);
-              return new Promise(function(resolve, reject) {
-                console.log("  Appending to readme: " + email);
-                fs.appendFile(readme, email + "\n", function(err) {
-                  console.log("  git add readme for " + email);
-                  repo.add("README.md", function(err) {
-                    if (err) {
-                      console.log("*** Error for " + email + ": ", err);
-                      reject(err);
-                    }
-                    console.log("  git commit for " + email);
-                    repo.commit("commit from " + email,
-                      {
-                        author: "Dummy <" + email + ">"
-                      },
-                      function(err) {
-                        console.log("after add, err = %o", err);
-                        resolve();
-                      });
+        fs.writeFile(readme, 'Initial line\n',
+          function (err) {
+            if (err) throw err;
+            console.log('Repo initialized');
+
+            emails.reduce(function(sequence, email) {
+              return sequence.then(function() {
+                console.log("Start sequence for " + email);
+                return new Promise(function(resolve, reject) {
+                  console.log("  Appending to readme: " + email);
+                  fs.appendFile(readme, "line\n", function(err) {
+                    console.log("  git add readme: " + email);
+                    repo.add("README.md", function(err) {
+                      if (err) {
+                        reject(err);
+                      }
+                      console.log("  git commit: " + email);
+                      repo.commit("dummy commit",
+                        {
+                          author: "Dummy <" + email + ">"
+                        },
+                        function(err) {
+                          console.log("  done: " + email);
+                          if (err) reject(err);
+                          else resolve();
+                        });
+                    });
                   });
                 });
               });
-            });
-          }, _sequence);
-          console.log("AFTER reduce, sequence = " + _sequence +
-              ", foo = " + _sequence.foo);
-        });
-
+            }, Promise.resolve());
+          });
+      });
     });
-
-  });
-
-
-})
-
-;
+  },
+  function(err) {
+    console.log("*** Error: " + err);
+  }
+);
 
