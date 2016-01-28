@@ -4,35 +4,13 @@ var fs = require('fs');
 var git = require('gift');
 var mkdirp = require('mkdirp');
 var readline = require('readline');
+var rimraf = require('rimraf');
 
 
 var dummy_repo = 'dummy-repo';
+var readme = dummy_repo + "/README.md";
 
-
-/*
-var rs = fs.createReadStream("foo.txt")
-  .on('error', function() {
-    console.log("got rs: error event");
-  })
-  .on('end', function() {
-    console.log("got rs: end event");
-  })
-  .on('close', function() {
-    console.log("got rs: close event");
-  })
-;
-
-var inf = readline.createInterface({input: rs})
-  .on('line', function() {
-    console.log("got inf: line event");
-  })
-  .on('close', function(data) {
-    console.log("got inf: close event");
-  })
-;
-//console.log("rs = %o", rs);
-*/
-
+rimraf.sync(dummy_repo);
 
 var lineReader = function(file, line_handler) {
   return new Promise(function(resolve, reject) {
@@ -62,6 +40,7 @@ var lineReader = function(file, line_handler) {
 
 
 
+var _sequence = Promise.resolve();
 
 
 var emails = [];
@@ -85,32 +64,55 @@ var p = lineReader('users.txt', function(line) {
 
 .then(function(emails) {
   console.log('emails: %o', emails);
-})
-
-;
-
-
-/*
-console.log("p = %o", p);
-
-p.then(function() {
-  console.log("foo");
-});
-/*
-
-.then(function() {
 
   mkdirp(dummy_repo, function(err) {
     if (err) {
       throw "Failed to make directory " + dummy_repo;
     }
 
-    git.init('dummy-repo', function(err, _repo) {
+    git.init(dummy_repo, function(err, repo) {
       if (err) {
         throw "Failed to initialize git repo"
       }
-      console.log("repo: %o", _repo);
-      repo = _repo;
+
+      fs.writeFile(readme, 'Initial line\n',
+        function (err) {
+          if (err) throw err;
+          console.log('Repo initialized');
+
+          _sequence.foo = 42;
+          emails.reduce(function(sequence, email) {
+            console.log("reduce, sequence = " + sequence + ", email = " + email +
+              ", foo = " + sequence.foo);
+            return sequence.then(function() {
+              console.log("Start sequence for " + email);
+              return new Promise(function(resolve, reject) {
+                console.log("  Appending to readme: " + email);
+                fs.appendFile(readme, email + "\n", function(err) {
+                  console.log("  git add readme for " + email);
+                  repo.add("README.md", function(err) {
+                    if (err) {
+                      console.log("*** Error for " + email + ": ", err);
+                      reject(err);
+                    }
+                    console.log("  git commit for " + email);
+                    repo.commit("commit from " + email,
+                      {
+                        author: "Dummy <" + email + ">"
+                      },
+                      function(err) {
+                        console.log("after add, err = %o", err);
+                        resolve();
+                      });
+                  });
+                });
+              });
+            });
+          }, _sequence);
+          console.log("AFTER reduce, sequence = " + _sequence +
+              ", foo = " + _sequence.foo);
+        });
+
     });
 
   });
@@ -118,5 +120,5 @@ p.then(function() {
 
 })
 
+;
 
-*/
