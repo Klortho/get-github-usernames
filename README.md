@@ -51,3 +51,8 @@ When it's done (the following steps are manual so far):
       command-line param, or in a config file).
     * Reading the commits from the API and producing the report
 
+## License
+
+<a href='http://www.wtfpl.net/'><img src='https://raw.githubusercontent.com/Klortho/dtd-diagram/28476aa90574bbedef999d8f88b0ead9dac2a819/wtfpl-badge-1.png'/></a>
+
+See [LICENSE.txt](LICENSE.txt).
