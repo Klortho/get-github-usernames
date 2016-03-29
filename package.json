@@ -1,6 +1,6 @@
 {
   "name": "get-github-usernames",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Determine GitHub usernames from email addresses, even if they are hidden",
   "main": "index.js",
   "scripts": {
