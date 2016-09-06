@@ -23,20 +23,29 @@ no reason it couldn't be.
 
 ## Using get-github-usernames
 
-Put the email addresses you want into a file named `users.txt, and
-then run ./index.js.
+Clone the repository and run `npm install` in the directory.  
 
-This creates a dummy git repository, and then makes a commit in it
+Put the email addresses you want to find usernames for into a file named `users.txt` (one address on each line), and
+then run `node ./index.js`.
+
+This creates a dummy git repository in a new folder called `dummy-repo`, and then makes a commit in it
 for each of the email addresses in the list.
 
 When it's done (the following steps are manual so far):
 
-* push the dummy-repo up to GitHub; e.g. klortho/dummy-repo,
+* create a new repository on GitHub, e.g. `dummy-repo`
+* set the remote for your local repo to the newly-created GitHub repo, e.g. `git remote add origin https://github.com/yourusername/dummy-repo`
+* push the dummy-repo up to GitHub; e.g. `git push --set-upstream origin master`
+
+Then either: 
+
+* Click on *x Commits* on the GitHub repo page. This should show you a list of commits with messages that include the email address and the username (if one exists for that email) below.
+
+Or: 
+
 * Access the GitHub API to get the usernames; e.g.
-  [https://api.github.com/repos/klortho/dummy-repo/commits](https://api.github.com/repos/klortho/dummy-repo/commits)
-* If there is a user that has that email address, then the username will
-  be in the `author/login` field for that commit. Cross-reference to the
-  email in the `commit/author/email` field.
+  [https://api.github.com/repos/yourusername/dummy-repo/commits](https://api.github.com/repos/yourusername/dummy-repo/commits)
+* If there is a user that has that email address, then the username will be in the `author/login` field for that commit.   Cross-reference to the email in the `commit/author/email` field.
 
 
 ## To do
