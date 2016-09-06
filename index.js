@@ -60,7 +60,7 @@ var p = lineReader('users.txt', function(line) {
                         reject(err);
                       }
                       console.log("  git commit: " + email);
-                      repo.commit("dummy commit by" + email,
+                      repo.commit("dummy commit by :" + email,
                         {
                           author: "Dummy <" + email + ">"
                         },
